@@ -1,5 +1,5 @@
 import numpy as np 
-import kernel_py as kp
+import quinoa as qu
 import GPy as gpy
 
 xx, yy = np.mgrid[-3:3:30j, -3:3:30j]
@@ -7,7 +7,7 @@ xx, yy = np.mgrid[-3:3:30j, -3:3:30j]
 X = np.vstack([xx.flatten(), yy.flatten()]).T
 Y = X
 
-ker1 = kp.RBF(2, 1, [1,2])
+ker1 = qu.RBF(2, 1, [1,2])
 ker2 = gpy.kern.RBF(2, 1, [1,2], ARD = True)
 
 C1 = ker1.cov(X)

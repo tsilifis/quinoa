@@ -1,13 +1,13 @@
 import numpy as np 
-import kernel_py as kp
+import quinoa as qu
 import GPy as gpy
 
 xx, yy = np.mgrid[-3:3:30j, -3:3:30j]
 
 X = np.vstack([xx.flatten(), yy.flatten()]).T
 
-ker1 = kp.Exponential(2,1,1)
-ker2 = gpy.kern.Exponential(2,1, [1, 10], ARD = True)
+ker1 = qu.Exponential(2,1,1)
+ker2 = gpy.kern.Exponential(2,1, [1, 1], ARD = True)
 
 C1 = ker1.cov(X)
 C2 = ker2.K(X)
