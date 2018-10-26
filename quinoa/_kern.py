@@ -277,7 +277,10 @@ class Exponential(Kernel):
 		self._var = variance
 		self._gamma = gamma
 
+		#if self._iso:
 		self._n_params = 2
+		#else:
+		#	self._n_params = self._input_dim + 1
 
 
 	def cov(self, X, Y = None):
@@ -307,6 +310,7 @@ class Exponential(Kernel):
 		assert X.shape[1] == self._input_dim
 		if Y is None:
 			diff = np.vstack([(X[:,i][:,None] - X[:,i][None,:]).reshape(1, X.shape[0], X.shape[0]) / self._lengthscale[i] for i in range(X.shape[1])])
+			#diff = np.vstack([(X[:,i][:,None] - X[:,i][None,:]).reshape(1, X.shape[0], X.shape[0]) / self._lengthscale[i] for i in range(X.shape[1])])
 			diff_sq = np.sum(np.square(diff), 0)
 			if self._iso:
 				return self._var * np.exp( - (np.sqrt(diff_sq) ) ** self._gamma ) * np.sqrt(diff_sq) ** self._gamma / self._lengthscale[0] ** (self._gamma - 1.)
