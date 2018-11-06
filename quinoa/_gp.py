@@ -129,6 +129,13 @@ class GP(object):
 		# --- Using optimize.basinhopping
 		minimizer_kwargs = {'method':'TNC', 'jac':True, 'bounds': bnds, 'options': {'ftol': 1e-16, 'gtol': 1e-16, 'maxiter' : 1000}}
 		res = basinhopping(neg_log_like, params, minimizer_kwargs = minimizer_kwargs)
+		print res.x
+		if self._kern._iso:
+			self._kern._lengthscale[0] = res.x[0]
+		else:
+			self._kern._lengthscale = res.x[:self._kern._input_dim]
+		self._kern._var = res.x[-2]
+		self._kern._noise_var = res.x[-1]
 		print res
 
 	def argmaxvar(self, bounds = (-4., 4.)):
