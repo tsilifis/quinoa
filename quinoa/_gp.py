@@ -72,6 +72,21 @@ class GP(object):
 		#f_var = self._kern.cov(X_test) - np.dot(v.T, v)
 		return f_mean, f_var
 
+	def sample(self, X_test, N = 1):
+		assert X_test.shape[1] == self._X.shape[1]
+
+		f_m, f_v = self.predict(X_test)
+		#L = np.linalg.cholesky(f_v)
+		[l, v] = np.linalg.eigh(f_v)
+		l2 = np.sqrt(np.maximum(l, np.zeros(l.shape[0])))
+		L = np.dot(v, np.diag(l2))
+		z = np.random.normal(size = (L.shape[0], N))
+		#Z = np.linalg.solve(L, z)	
+		Z = np.dot(L, z)
+		print Z.shape, f_m.shape
+		return np.dot(f_m.reshape(f_m.shape[0], 1), np.ones((1,N))) + Z
+
+
 	def log_marginal_likelihood(self, params):
 		assert len(params) == self._kern._n_params + 1
 		n = self._kern._n_params
@@ -127,7 +142,7 @@ class GP(object):
 		#res = minimize(neg_log_like, params, method = 'TNC', jac = True, bounds = bnds, options = {'ftol': 1e-16, 'gtol': 1e-16, 'maxiter' : 1000})
 		
 		# --- Using optimize.basinhopping
-		minimizer_kwargs = {'method':'TNC', 'jac':True, 'bounds': bnds, 'options': {'ftol': 1e-16, 'gtol': 1e-16, 'maxiter' : 1000}}
+		minimizer_kwargs = {'method':'TNC', 'jac':True, 'bounds': bnds, 'options': {'ftol': 1e-16, 'gtol': 1e-16, 'maxiter' : 5000}}
 		res = basinhopping(neg_log_like, params, minimizer_kwargs = minimizer_kwargs)
 		print res.x
 		if self._kern._iso:
@@ -136,6 +151,15 @@ class GP(object):
 			self._kern._lengthscale = res.x[:self._kern._input_dim]
 		self._kern._var = res.x[-2]
 		self._kern._noise_var = res.x[-1]
+
+		cov = self._kern.cov(self._X)
+		n = self._X.shape[0]
+		cov += np.diag((self._noise_var + 1e-8) * np.ones(cov.shape[0]))
+		L = np.linalg.cholesky(cov)
+		self._chol = L
+		a = np.linalg.solve(L.T, np.linalg.solve(L, self._Y[:,0]))
+
+		self._scaled_data = a
 		print res
 
 	def argmaxvar(self, bounds = (-4., 4.)):
