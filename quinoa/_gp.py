@@ -78,12 +78,12 @@ class GP(object):
 		f_m, f_v = self.predict(X_test)
 		#L = np.linalg.cholesky(f_v)
 		[l, v] = np.linalg.eigh(f_v)
-		l2 = np.sqrt(np.maximum(l, np.zeros(l.shape[0])))
-		L = np.dot(v, np.diag(l2))
+		#l2 = np.sqrt(np.maximum(l, np.zeros(l.shape[0])))
+		l_sq = np.sqrt(l)
+		L = np.dot(v, np.diag(l_sq))
 		z = np.random.normal(size = (L.shape[0], N))
-		#Z = np.linalg.solve(L, z)	
 		Z = np.dot(L, z)
-		print Z.shape, f_m.shape
+
 		return np.dot(f_m.reshape(f_m.shape[0], 1), np.ones((1,N))) + Z
 
 

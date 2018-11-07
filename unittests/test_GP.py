@@ -5,9 +5,9 @@ import GPy as gpy
 from scipy import linalg
 #np.random.seed(31051985)
 
-X = np.random.normal(scale = 1, size = (10,1))
+X = np.random.normal(scale = 1, size = (100,1))
 
-Y = np.sin(X) + 0.01 * np.random.normal(size = (10,1))
+Y = np.sin(X) + 0.01 * np.random.normal(size = (100,1))
 
 #kern = qu.RBF(1, 1, 1)
 ker = gpy.kern.RBF(1, 1, 1)
@@ -52,7 +52,6 @@ print gp._log_marginal_likelihood
 print m._log_marginal_likelihood
 
 f, var = gp.predict(x)
-print np.diag(var)[:10]
 z = gp.sample(x, 5)#[:,0]
 
 
