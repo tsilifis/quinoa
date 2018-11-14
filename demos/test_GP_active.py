@@ -52,13 +52,14 @@ ax2.fill_between(x[:,0], f - 2*np.sqrt(np.diag(var)), f + 2*np.sqrt(np.diag(var)
 ax2.plot(X[:,0], Y[:,0], 'x')
 plt.show()
 #
-sig = np.zeros(10)
-sig_noise = np.zeros(10)
-ell = np.zeros(10)
+N_points = 15
+sig = np.zeros(N_points)
+sig_noise = np.zeros(N_points)
+ell = np.zeros(N_points)
 sig[0] = gp._kern._var
 sig_noise[0] = gp._noise_var
 ell[0] = gp._kern._lengthscale[0]
-for i in range(9):
+for i in range(N_points-1):
 	x_new = gp.argmaxvar()
 	print 'New design :' + str(x_new)
 	print x_new.shape

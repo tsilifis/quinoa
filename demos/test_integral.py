@@ -1,26 +1,29 @@
 import numpy as np 
 from GP_integral import *
-import kernel_py as kp
+import quinoa as qu
 
 
-X = np.load('X.npy')[:4,:]
-Y = np.load('Y.npy')[:4,:]
-Q = 9
-
-I = IntegralPosterior(X, Y, Q)
-
-pi = np.zeros((X.shape[0],Q))
-rho = np.zeros(Q)
+X = np.load('X.npy')[:6,:]
+Y = np.load('Y.npy')[:6,:]
+print X
+Q = 6
 
 var = np.load('sig.npy')[3]
 ell = np.load('ell.npy')[3]
 
-rbf = kp.RBF(1, var, ell)
+rbf = qu.RBF(1, var, ell)
+
+I = IntegralPosterior(X, Y, Q, rbf)
+
+pi = np.zeros((X.shape[0],Q))
+rho = np.zeros(Q)
+
+
 
 for i in range(Q):
 	for j in range(X.shape[0]):
-		pi[j,i] = I.pi(i, X[j,0], ell)
-	rho[i] = I.rho(i,i, ell)
+		pi[j,i] = I.pi_H(i, X[j,0], ell)
+	rho[i] = I.rho_H(i,i, ell)
 
 
 
@@ -38,17 +41,17 @@ C = C1 - np.diag(np.dot(T.T, T))
 print C
 
 
-import chaos_toolbox as ct 
-[quad_x, w] = ct.util.QuadratureRule().get_rule(1, 3)
+import chaos_basispy as cb 
+[quad_x, w] = cb.QuadratureRule('GH').get_rule(1, 3)
 print quad_x.shape
 sin_quad = np.sin(quad_x).flatten()
 
 
-coeffs = ct.chaos.PolyChaos().comp_coeffs(quad_x, sin_quad, w, Q-1)
+coeffs = cb.PolyChaos().comp_coeffs(quad_x, sin_quad, w, Q-1)
 #print coeffs.shape
 
 
-pol = ct.chaos.PolyBasis(1, Q-1)
+pol = cb.PolyBasis(1, Q-1)
 xi = np.linspace(-4., 4., 100).reshape(100,1)
 P = pol(xi)
 sinxi = np.sin(xi)
@@ -69,4 +72,5 @@ plt.show()
 plt.plot(xi[:,0], q_bayes, 'x')
 plt.plot(xi[:,0], sinxi, '^', alpha = 0.4)
 plt.plot(xi[:,0], q_quad, '*')
+plt.xlim([-4., 4.])
 plt.show()

@@ -1,8 +1,8 @@
 import numpy as np
 import scipy.stats as st
 import math
-import kernel_py as kp
-from chaos_toolbox import chaos, util
+import quinoa as qu
+import chaos_basispy as cb
 
 
 class IntegralPosterior(object):
@@ -26,7 +26,7 @@ class IntegralPosterior(object):
 		self._input_dim = X.shape[1]
 		assert Y.shape[1] == 1
 		assert isinstance(pol_order, int)
-		assert isinstance(kern, kp.Kernel)
+		assert isinstance(kern, qu.Kernel)
 		self._X = X
 		self._Y = Y
 		self._pol_order = pol_order
@@ -91,18 +91,18 @@ class IntegralPosterior(object):
 		if n == 0:
 			psi_a = np.ones(quad_x[:,0].shape)
 		else:
-			psi_a = chaos.Legendre1d(n)(quad_x[:,0])[:,-1]
+			psi_a = cb.Legendre1d(n)(quad_x[:,0])[:,-1]
 		if m == 0:
 			psi_b = np.ones(quad_x[:,1].shape)
 		else:
-			psi_b = chaos.Legendre1d(m)(quad_x[:,1])[:,-1]
+			psi_b = cb.Legendre1d(m)(quad_x[:,1])[:,-1]
 		return 4 * np.sum([ psi_a[i] * psi_b[i] * np.exp(- (quad_x[i,0] - quad_x[i,1])**2 / (2*l**2)) * quad_w[i] for i in range(quad_x.shape[0])] )
 
 	def v_all(self, pol = 'H'):	
 		
 		assert pol in ['H', 'L']
 		ell = self._kern._lengthscale
-		mi = chaos.PolyBasis().mi_terms(self._input_dim, self._pol_order)
+		mi = cb.PolyBasis().mi_terms(self._input_dim, self._pol_order)
 		v_all = np.ones((mi.shape[0], self._X.shape[0]))
 
 		if pol == 'H':
@@ -118,7 +118,7 @@ class IntegralPosterior(object):
 			C = self._kern._var / (2** self._input_dim)
 			PIs = np.zeros((self._pol_order+1, self._X.shape[0], self._X.shape[1]))
 			order = np.min([self._pol_order, 10])
-			quad = util.QuadratureRule('CC').get_rule(1, order)
+			quad = cb.QuadratureRule('CC').get_rule(1, order)
 
 			for i in range(self._X.shape[0]):
 				for j in range(self._X.shape[1]):
@@ -136,7 +136,7 @@ class IntegralPosterior(object):
 		order = np.min([self._pol_order, 10])
 
 		ell = self._kern._lengthscale
-		mi = chaos.PolyBasis().mi_terms(self._input_dim, self._pol_order)
+		mi = cb.PolyBasis().mi_terms(self._input_dim, self._pol_order)
 		u_all = np.ones(mi.shape[0])
 		if pol == 'H':
 			C = self._kern._var / (2. * np.pi) ** self._input_dim
@@ -146,7 +146,7 @@ class IntegralPosterior(object):
 				u_all[i] *= C
 			return u_all
 		else:
-			quad = util.QuadratureRule('CC').get_rule(2, order)
+			quad = cb.QuadratureRule('CC').get_rule(2, order)
 			C = self._kern._var / (2. ** (2*self._input_dim))
 			for i in range(mi.shape[0]):
 				for j in range(mi.shape[1]):
