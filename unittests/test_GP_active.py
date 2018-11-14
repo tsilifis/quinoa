@@ -76,7 +76,7 @@ for i in range(10):
 	#x = np.linspace(np.min([x.min() x_new[0]]), np.max([x.max(), x_new[0]]), 100).reshape(100,1)
 
 	f, var = gp_new.predict(x)
-	print var
+
 	fig1 = plt.figure()
 	ax2 = fig1.add_subplot(111)
 	ax2.plot(x, f, '-')

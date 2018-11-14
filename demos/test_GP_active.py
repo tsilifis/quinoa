@@ -1,5 +1,5 @@
 import numpy as np 
-import kernel_py as kp
+import quinoa as qu
 import matplotlib.pyplot as plt
 import GPy as gpy
 from scipy import linalg
@@ -10,13 +10,13 @@ X = np.random.normal(scale = 1, size = (2,1))
 
 Y = np.sin(X)# + 0.1 * np.random.normal(size = (3,1))
 
-kern = kp.RBF(1, 1, 1)
+kern = qu.RBF(1, 1, 1)
 ker = gpy.kern.RBF(1, 1, 1)
 
 m = gpy.models.GPRegression(X, Y, ker)
 
 
-gp = kp.GP(X, Y, kern)
+gp = qu.GP(X, Y, kern)
 
 x = np.linspace(-4., 4., 100).reshape(100,1)
 
@@ -66,7 +66,7 @@ for i in range(9):
 	X = np.vstack([X, x_new])
 	Y = np.vstack([Y, y_new])
 	
-	gp_new = kp.GP(X, Y, kern)
+	gp_new = qu.GP(X, Y, kern)
 	gp_new.optimize()
 	#gp_new._kern._lengthscale
 	sig[i+1] = gp_new._kern._var
