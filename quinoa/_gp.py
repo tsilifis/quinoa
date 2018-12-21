@@ -186,16 +186,8 @@ class GP(object):
 		else:
 			self._kern._lengthscale = res.x[:self._kern._input_dim]
 		self._kern._var = res.x[-2]
-		self._kern._noise_var = res.x[-1]
+		self.noise_var(res.x[-1])
 
-		cov = self._kern.cov(self._X)
-		n = self._X.shape[0]
-		cov += np.diag((self._noise_var + 1e-8) * np.ones(cov.shape[0]))
-		L = np.linalg.cholesky(cov)
-		self._chol = L
-		a = np.linalg.solve(L.T, np.linalg.solve(L, self._Y[:,0]))
-
-		self._scaled_data = a
 		print res
 
 	def argmaxvar(self, bounds = (-4., 4.)):
