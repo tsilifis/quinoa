@@ -10,7 +10,7 @@ X = np.random.normal(scale = 1, size = (2,1))
 
 Y = np.sin(X)# + 0.1 * np.random.normal(size = (3,1))
 
-kern = qu.RBF(1, 1, 1)
+kern = qu.RBF(1, 1, 4)
 ker = gpy.kern.RBF(1, 1, 1)
 
 m = gpy.models.GPRegression(X, Y, ker)
