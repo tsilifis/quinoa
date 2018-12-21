@@ -34,6 +34,42 @@ class GP(object):
 
 	_chol = None
 
+	@property
+	def kern(self):
+		return self._kern
+
+	@kern.setter	
+	def kern(self, value):
+		assert assert isinstance(value, Kernel)
+		self._kern = value
+		cov = self._kern.cov(X)
+		n = X.shape[0]
+		cov += np.diag((self._noise_var + 1e-8) * np.ones(cov.shape[0]))
+		L = np.linalg.cholesky(cov)
+		self._chol = L
+		a = np.linalg.solve(L.T, np.linalg.solve(L, Y[:,0]))
+
+		self._scaled_data = a
+		self._log_marginal_likelihood = - n * np.log(2*np.pi) / 2. - np.log(np.diag(L)).sum() - (Y[:,0] * a).sum() / 2.
+
+	@property
+	def noise_var(self):
+		return self._noise_var
+
+	@noise_var.setter
+	def noise_var(self, value):
+		self._noise_var = value
+		cov = self._kern.cov(X)
+		n = X.shape[0]
+		cov += np.diag((self._noise_var + 1e-8) * np.ones(cov.shape[0]))
+		L = np.linalg.cholesky(cov)
+		self._chol = L
+		a = np.linalg.solve(L.T, np.linalg.solve(L, Y[:,0]))
+
+		self._scaled_data = a
+		self._log_marginal_likelihood = - n * np.log(2*np.pi) / 2. - np.log(np.diag(L)).sum() - (Y[:,0] * a).sum() / 2.
+	
+
 	def __init__(self, X, Y, kernel, noise_var = 1.):
 		"""
 		Initializes the object
